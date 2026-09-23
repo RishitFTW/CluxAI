@@ -1,0 +1,21 @@
+llm:
+  provider: ollama
+  model: qwen3:8B 
+
+embeddings:
+  provider: gemini
+  model: gemini-embedding-2
+
+vector_store:
+  provider: qdrant
+
+qdrant:
+  collection_name: codebase
+
+chromadb:
+  persist_dir: .chromadb/
+  collection_name: codebase
+
+elasticsearch:
+  url: http://localhost:9200
+  index_name: codebase
