@@ -6,11 +6,15 @@ embeddings:
   provider: gemini
   model: gemini-embedding-2
 
+rag:
+ mode: hybrid # semantic | hybrid
+
 vector_store:
-  provider: qdrant
+ provider: qdrant
+ retrieval_mode: hybrid # dense | sparse | hybrid
 
 qdrant:
-  collection_name: codebase
+  collection_name: codebase_hybrid
 
 chromadb:
   persist_dir: .chromadb/
