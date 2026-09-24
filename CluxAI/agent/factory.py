@@ -1,9 +1,8 @@
-from langchain.agents import create_agent
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
 from CluxAI.agent.tools import search_codebase
 from CluxAI.llm.factory import get_llm
+from CluxAI.memory.short_term import get_checkpointer
 from CluxAI.observability.logger import get_logger
+from langchain.agents import create_agent
 
 logger = get_logger(__name__)
 
@@ -14,13 +13,14 @@ If you cannot find the answer in the codebase, say so explicitly."""
 
 
 def build_agent():
-    """Create and return a LangChain agent."""
+    """Create and return a LangChain agent with persistent memory."""
     llm = get_llm()
     tools = [search_codebase]
-    logger.info("Creating agent")
+    checkpointer = get_checkpointer()
 
     return create_agent(
         llm,
         tools=tools,
         system_prompt=SYSTEM_PROMPT,
+        checkpointer=checkpointer,
     )

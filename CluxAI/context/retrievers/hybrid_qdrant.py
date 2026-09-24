@@ -3,7 +3,7 @@ import os
 from CluxAI.config import config
 from CluxAI.llm.factory import get_embedder
 from CluxAI.observability.logger import get_logger
-from CluxAI import FastEmbedSparse, QdrantVectorStore, RetrievalMode
+from langchain_qdrant import FastEmbedSparse, QdrantVectorStore, RetrievalMode
 
 logger = get_logger(__name__)
 
