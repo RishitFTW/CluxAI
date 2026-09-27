@@ -1,43 +1,32 @@
-import sqlite3
-from langgraph.checkpoint.sqlite import SqliteSaver
-from langchain.agents.middleware import SummarizationMiddleware
 from pathlib import Path
+
 from CluxAI.config import config
 from CluxAI.llm.factory import get_llm
 from CluxAI.observability.logger import get_logger
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from langchain.agents.middleware import SummarizationMiddleware
 
 logger = get_logger(__name__)
 
 
-def get_checkpointer() -> SqliteSaver:
-    """Initialize and return a SQLite checkpointer for persistence."""
+def get_checkpointer_db_path() -> str:
+    """Ensure the parent directory exists and return the SQLite database path."""
     db_path = config["memory"]["db_path"]
-    Path(db_path).parent.mkdir(exist_ok=True)
+    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
     logger.info(f"Using SQLite checkpointer at {db_path}")
-
-    conn = sqlite3.connect(db_path, check_same_thread=False)
-    return SqliteSaver(conn)
+    return db_path
 
 
-def get_session_history(thread_id: str) -> list[dict]:
-    """Retrieve message history for a given session thread ID."""
-    checkpointer = get_checkpointer()
-    config_ = {"configurable": {"thread_id": thread_id}}
-    checkpoint = checkpointer.get(config_)
-
-    if not checkpoint:
-        return []
-
-    messages = checkpoint["channel_values"].get("messages", [])
-    return [
-        {"role": "user" if m.type == "human" else "assistant", "content": m.content}
-        for m in messages
-    ]
+def get_checkpointer() -> AsyncSqliteSaver:
+    """Initialize and return an AsyncSqliteSaver checkpointer for persistence."""
+    db_path = get_checkpointer_db_path()
+    return AsyncSqliteSaver.from_conn_string(db_path)
 
 
 def get_summarization_middleware() -> SummarizationMiddleware:
-    """Initialize and return summarization middleware based on token threshold."""
+    """Initialize and return summarization middleware configured via token thresholds."""
     return SummarizationMiddleware(
         model=get_llm(),
         trigger=("tokens", config["memory"]["summarize_at_tokens"]),
+        keep=("messages", config["memory"]["keep_last_messages"]),
     )

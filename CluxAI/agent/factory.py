@@ -1,10 +1,9 @@
 from CluxAI.agent.tools import search_codebase
 from CluxAI.llm.factory import get_llm
-from CluxAI.memory.short_term import get_checkpointer
+from CluxAI.mcp.cluxai_mcp_client import get_cluxai_mcp_tools
 from CluxAI.observability.logger import get_logger
 from CluxAI.tools.filesystem_tools import (
     append_file,
-    delete_file,
     file_exists,
     list_directory,
     read_file,
@@ -21,9 +20,10 @@ Reference specific file names, function names and line numbers in your answers.
 If you cannot find the answer in the codebase, say so explicitly."""
 
 
-def build_agent():
-    """Create and return a LangChain agent with persistent memory."""
+async def build_agent(checkpointer):
+    """Create and return a LangChain agent with persistent memory and loaded MCP tools."""
     llm = get_llm()
+    mcp_tools = await get_cluxai_mcp_tools()
     tools = [
         search_codebase,
         run_command,
@@ -31,12 +31,10 @@ def build_agent():
         read_file,
         write_file,
         append_file,
-        delete_file,
         list_directory,
         file_exists,
+        *mcp_tools,
     ]
-    checkpointer = get_checkpointer()
-
     return create_agent(
         llm,
         tools=tools,
