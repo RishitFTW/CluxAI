@@ -28,13 +28,19 @@ async def build_agent(checkpointer):
         search_codebase,
         run_command,
         run_in_directory,
-        read_file,
-        write_file,
-        append_file,
-        list_directory,
-        file_exists,
         *mcp_tools,
     ]
+    #     tools = [
+    #     search_codebase,
+    #     run_command,
+    #     run_in_directory,
+    #     read_file,
+    #     write_file,
+    #     append_file,
+    #     list_directory,
+    #     file_exists,
+    #     *mcp_tools,
+    # ]
     return create_agent(
         llm,
         tools=tools,
