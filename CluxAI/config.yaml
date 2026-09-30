@@ -17,14 +17,17 @@ qdrant:
   collection_name: codebase_hybrid
 
 chromadb:
-  persist_dir: .chromadb/
+  persist_dir: .cluxai/chromadb/
   collection_name: codebase
 
 memory:
-  db_path: .memory/memory.db
+  db_path: .cluxai/memory/memory.db
   summarize_at_tokens: 400
   keep_last_messages: 20
   
+skills:
+  skills_dir: .cluxai/skills
+
 elasticsearch:
   url: http://localhost:9200
   index_name: codebase

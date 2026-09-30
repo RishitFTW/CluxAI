@@ -2,6 +2,10 @@ from CluxAI.agent.tools import search_codebase
 from CluxAI.llm.factory import get_llm
 from CluxAI.mcp.cluxai_mcp_client import get_cluxai_mcp_tools
 from CluxAI.observability.logger import get_logger
+from CluxAI.skills.skill_tools import (
+    build_skills_prompt,
+    load_skill,
+)
 from CluxAI.tools.filesystem_tools import (
     append_file,
     file_exists,
@@ -21,29 +25,31 @@ If you cannot find the answer in the codebase, say so explicitly."""
 
 
 async def build_agent(checkpointer):
-    """Create and return a LangChain agent with persistent memory and loaded MCP tools."""
+    """Create and return a LangChain agent with persistent memory and skills support."""
     llm = get_llm()
     mcp_tools = await get_cluxai_mcp_tools()
+    skills_prompt = build_skills_prompt()
+
+    full_prompt = SYSTEM_PROMPT
+    if skills_prompt:
+        full_prompt = f"{SYSTEM_PROMPT}\n\n{skills_prompt}"
+
     tools = [
         search_codebase,
+        load_skill,
         run_command,
         run_in_directory,
+        read_file,
+        write_file,
+        append_file,
+        list_directory,
+        file_exists,
         *mcp_tools,
     ]
-    #     tools = [
-    #     search_codebase,
-    #     run_command,
-    #     run_in_directory,
-    #     read_file,
-    #     write_file,
-    #     append_file,
-    #     list_directory,
-    #     file_exists,
-    #     *mcp_tools,
-    # ]
+
     return create_agent(
         llm,
         tools=tools,
-        system_prompt=SYSTEM_PROMPT,
+        system_prompt=full_prompt,
         checkpointer=checkpointer,
     )
