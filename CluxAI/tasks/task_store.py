@@ -194,6 +194,14 @@ class SQLiteTaskStore:
             ).fetchone()
             return row["id"] if row else None
 
+    def complete_project(self, project_id: str) -> None:
+        """Mark a project as completed when all tasks finish."""
+        with self._conn() as conn:
+            conn.execute(
+                "UPDATE projects SET status='completed' WHERE id=?",
+                (project_id,),
+            )
+
     # ------------------------------------------------------------------
     # Atomic state transitions
     # ------------------------------------------------------------------

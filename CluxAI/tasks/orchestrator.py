@@ -58,6 +58,7 @@ class TaskOrchestrator:
                 f" · {failed} failed[/dim]"
             )
             if pending == 0 and in_progress == 0:
+                self.store.complete_project(project_id)
                 _print_final_summary(progress)
                 break
             ready = self.store.get_ready_tasks(project_id)

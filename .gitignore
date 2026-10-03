@@ -11,3 +11,5 @@ poetry.lock
 # Virtual environments
 .venv/
 venv/
+# cluxai cache
+.cluxai/
