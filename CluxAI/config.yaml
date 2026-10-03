@@ -1,3 +1,7 @@
+tasks:
+  db_path: .cluxai/tasks.db
+
+
 llm:
   provider: ollama
   model: qwen3:8B 
@@ -5,6 +9,7 @@ llm:
 embeddings:
   provider: gemini
   model: gemini-embedding-2
+  judge_model: gpt-4o-mini # cheaper model used only for LLM-as-judge
 
 rag:
  mode: hybrid # semantic | hybrid

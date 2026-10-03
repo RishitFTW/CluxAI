@@ -17,6 +17,8 @@ from CluxAI.memory.session import (
 )
 from CluxAI.memory.short_term import get_checkpointer_db_path
 from CluxAI.observability.logger import get_logger
+from CluxAI.tasks.orchestrator import handle_plan_command 
+from CluxAI.tasks.status import show_task_status 
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from rich.console import Console
 from rich.prompt import Prompt
@@ -91,6 +93,12 @@ async def _run_async():
             elif user_input == "/show_index":
                 logger.info("Showing index")
                 get_index_inspector()(index)
+            elif user_input.startswith("/plan "):
+                goal = user_input.removeprefix("/plan ").strip()
+                logger.info(f"Plan command received: {goal}")
+                await handle_plan_command(goal)
+            elif user_input == "/task_status":
+                show_task_status()
             else:
                 logger.warning(f"Unknown command received: {user_input}")
                 console.print("[yellow]Unknown command. Try:[/yellow]")
@@ -109,6 +117,12 @@ async def _run_async():
                 console.print(
                     "  [bold]/session[/bold] — show current session id"
                 )
+                console.print(
+                    "  [bold]/plan <goal>[/bold] — generate and execute a multi-step task plan"
+               )
+                console.print(
+                    "  [bold]/task_status[/bold] — show task progress for active project"
+            )
 
 
 def run():
